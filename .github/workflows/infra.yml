@@ -1,0 +1,23 @@
+name: Infra Pipeline
+
+on:
+  push:
+    branches: [ infra ]
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build all Docker images
+        run: |
+          docker build -t naysp/auth-api ./auth-api
+          docker build -t naysp/todos-api ./todos-api
+          docker build -t naysp/users-api ./users-api
+          docker build -t naysp/log-message-processor ./log-message-processor
+          docker build -t naysp/frontend ./frontend
+
+      - name: Push to DockerHub
+        run: echo "Aquí iría docker push si conectamos DockerHub"

@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  # --- Base de datos Redis (cola de mensajes para logs)
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  # --- Zipkin (tracing de microservicios)
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
+  # --- Auth API (Go)
+  auth-api:
+    build:
+      context: ../auth-api
+      dockerfile: Dockerfile
+    container_name: auth-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+    depends_on:
+      - zipkin
+
+  # --- Todos API (Node.js)
+  todos-api:
+    build:
+      context: ../todos-api
+      dockerfile: Dockerfile
+    container_name: todos-api
+    ports:
+      - "8001:8001"
+    environment:
+      - REDIS_HOST=redis
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+    depends_on:
+      - redis
+      - zipkin
+
+  # --- Users API (Spring Boot - Java)
+  users-api:
+    build:
+      context: ../users-api
+      dockerfile: Dockerfile
+    container_name: users-api
+    ports:
+      - "8002:8002"
+    environment:
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+    depends_on:
+      - zipkin
+
+  # --- Log Message Processor (Python)
+  log-message-processor:
+    build:
+      context: ../log-message-processor
+      dockerfile: Dockerfile
+    container_name: log-processor
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+
+  # --- Frontend (Vue.js)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8080:8080"
+    environment:
+      - VUE_APP_AUTH_API=http://auth-api:8000
+      - VUE_APP_TODOS_API=http://todos-api:8001
+      - VUE_APP_USERS_API=http://users-api:8002
+    depends_on:
+      - auth-api
+      - todos-api
+      - users-api

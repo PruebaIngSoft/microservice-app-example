@@ -1,0 +1,24 @@
+name: CI Users API
+
+on:
+  push:
+    branches: [ develop, feature/* ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Maven
+        run: cd users-api && mvn clean package -DskipTests
+
+      - name: Build Docker image
+        run: docker build -t naysp/users-api ./users-api
