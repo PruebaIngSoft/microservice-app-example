@@ -38,7 +38,7 @@ services:
       - "8001:8001"
     environment:
       - REDIS_HOST=redis
-      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - REDIS_PORT=6379
     depends_on:
       - redis
       - zipkin
