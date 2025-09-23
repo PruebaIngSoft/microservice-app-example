@@ -1,23 +1,24 @@
 name: CI Auth API
-
 on:
   push:
     branches: [ develop, feature/* ]
+    paths: [ 'auth-api/**' ]
+  pull_request:
+    branches: [ develop ]
+    paths: [ 'auth-api/**' ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-
       - name: Build
         run: cd auth-api && go build ./...
-
+      - name: Test
+        run: cd auth-api && go test ./...
       - name: Build Docker image
-        run: docker build -t naysp/auth-api ./auth-api
+        run: docker build -t naysp/auth-api:${{ github.sha }} ./auth-api

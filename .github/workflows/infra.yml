@@ -1,23 +1,22 @@
-name: Infra Pipeline
-
+name: Infrastructure Pipeline
 on:
   push:
     branches: [ infra ]
+    paths: [ 'infra/**' ]
 
 jobs:
-  infra:
+  build-all:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - name: Build all Docker images
         run: |
-          docker build -t naysp/auth-api ./auth-api
-          docker build -t naysp/todos-api ./todos-api
-          docker build -t naysp/users-api ./users-api
-          docker build -t naysp/log-message-processor ./log-message-processor
-          docker build -t naysp/frontend ./frontend
-
-      - name: Push to DockerHub
-        run: echo "Aquí iría docker push si conectamos DockerHub"
+          docker build -t naysp/auth-api:latest ./auth-api
+          docker build -t naysp/todos-api:latest ./todos-api
+          docker build -t naysp/users-api:latest ./users-api
+          docker build -t naysp/log-processor:latest ./log-message-processor
+          docker build -t naysp/frontend:latest ./frontend
+      - name: Test docker-compose
+        run: |
+          cd infra
+          docker-compose config
