@@ -6,14 +6,14 @@
   "scripts": {
     "start": "nodemon server.js"
   },
-  "author": "elgris <iddqd07@yandex.ru>",
+  "author": "nsjsc",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.15.4",
     "express-jwt": "^5.3.0",
     "memory-cache": "^0.2.0",
-    "redis": "^2.8.0",
+    "redis": "^3.1.2",
     "zipkin": "^0.11.2",
     "zipkin-context-cls": "^0.11.0",
     "zipkin-instrumentation-express": "^0.11.2",

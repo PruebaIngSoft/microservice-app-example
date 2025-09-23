@@ -1,24 +1,25 @@
 name: CI Users API
-
 on:
   push:
     branches: [ develop, feature/* ]
+    paths: [ 'users-api/**' ]
+  pull_request:
+    branches: [ develop ]
+    paths: [ 'users-api/**' ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
       - name: Build with Maven
-        run: cd users-api && mvn clean package -DskipTests
-
+        run: cd users-api && ./mvnw clean compile
+      - name: Run tests
+        run: cd users-api && ./mvnw test
       - name: Build Docker image
-        run: docker build -t naysp/users-api ./users-api
+        run: docker build -t naysp/users-api:${{ github.sha }} ./users-api

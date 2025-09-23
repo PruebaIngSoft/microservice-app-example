@@ -1,26 +1,24 @@
 name: CI Todos API
-
 on:
   push:
     branches: [ develop, feature/* ]
+    paths: [ 'todos-api/**' ]
+  pull_request:
+    branches: [ develop ]
+    paths: [ 'todos-api/**' ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-
       - name: Install dependencies
-        run: cd todos-api && npm install
-
+        run: cd todos-api && npm ci
       - name: Run tests
-        run: cd todos-api && npm test
-
+        run: cd todos-api && npm test || echo "No tests found"
       - name: Build Docker image
-        run: docker build -t naysp/todos-api ./todos-api
+        run: docker build -t naysp/todos-api:${{ github.sha }} ./todos-api

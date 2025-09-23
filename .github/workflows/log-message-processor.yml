@@ -1,26 +1,24 @@
 name: CI Log Processor
-
 on:
   push:
     branches: [ develop, feature/* ]
+    paths: [ 'log-message-processor/**' ]
+  pull_request:
+    branches: [ develop ]
+    paths: [ 'log-message-processor/**' ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
       - name: Install dependencies
         run: cd log-message-processor && pip install -r requirements.txt
-
-      - name: Run script
+      - name: Run script test
         run: cd log-message-processor && python main.py --help || true
-
       - name: Build Docker image
-        run: docker build -t naysp/log-message-processor ./log-message-processor
+        run: docker build -t naysp/log-processor:${{ github.sha }} ./log-message-processor

@@ -25,6 +25,9 @@ services:
       - "8000:8000"
     environment:
       - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - AUTH_API_PORT=8000
+      - USERS_API_ADDRESS=http://users-api:8002
+      - JWT_SECRET=myfancysecret
     depends_on:
       - zipkin
 
@@ -35,10 +38,11 @@ services:
       dockerfile: Dockerfile
     container_name: todos-api
     ports:
-      - "8001:8001"
+      - "8082:8082"
     environment:
       - REDIS_HOST=redis
       - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - JWT_SECRET=myfancysecret
     depends_on:
       - redis
       - zipkin
@@ -66,6 +70,9 @@ services:
       - redis
     environment:
       - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_CHANNEL=log-messages
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
 
   # --- Frontend (Vue.js)
   frontend:
@@ -77,9 +84,13 @@ services:
       - "8080:8080"
     environment:
       - VUE_APP_AUTH_API=http://auth-api:8000
-      - VUE_APP_TODOS_API=http://todos-api:8001
+      - VUE_APP_TODOS_API=http://todos-api:8082
       - VUE_APP_USERS_API=http://users-api:8002
+      - AUTH_API_ADDRESS=http://auth-api:8000
+      - TODOS_API_ADDRESS=http://todos-api:8082
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
     depends_on:
       - auth-api
       - todos-api
       - users-api
+      - zipkin
