@@ -17,7 +17,9 @@
     "zipkin": "^0.11.2",
     "zipkin-context-cls": "^0.11.0",
     "zipkin-instrumentation-express": "^0.11.2",
-    "zipkin-transport-http": "^0.11.2"
+    "zipkin-transport-http": "^0.11.2",
+    "opossum": "^8.0.0",
+    "axios": "^1.6.0"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

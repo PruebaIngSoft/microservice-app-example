@@ -31,4 +31,25 @@ module.exports = function (app, {tracer, redisClient, logChannel}) {
             resp.status(500).json({ error: 'Internal server error' });
         }
     });
+
+  // New routes for circuit breaker monitoring and demo
+  app.route('/circuit-breaker/stats')
+    .get(async function(req, resp) {
+        try {
+            return await todoController.getBreakerStats(req, resp);
+        } catch (error) {
+            console.error('Route error:', error);
+            resp.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
+  app.route('/circuit-breaker/simulate/:service')
+    .post(async function(req, resp) {
+        try {
+            return await todoController.simulateFailure(req, resp);
+        } catch (error) {
+            console.error('Route error:', error);
+            resp.status(500).json({ error: 'Internal server error' });
+        }
+    });
 };
