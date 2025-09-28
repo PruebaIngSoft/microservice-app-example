@@ -1,24 +1,39 @@
-name: CI Log Processor
+name: CI/CD - log-message-processor
+
 on:
   push:
-    branches: [ develop, feature/* ]
-    paths: [ 'log-message-processor/**' ]
+    branches: [ "develop" ]
+    paths:
+      - "log-message-processor/**"
   pull_request:
-    branches: [ develop ]
-    paths: [ 'log-message-processor/**' ]
+    branches: [ "develop" ]
+    paths:
+      - "log-message-processor/**"
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: cd log-message-processor && pip install -r requirements.txt
-      - name: Run script test
-        run: cd log-message-processor && python main.py --help || true
-      - name: Build Docker image
-        run: docker build -t naysp/log-processor:${{ github.sha }} ./log-message-processor
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./log-message-processor
+          push: true
+          tags: |
+            ${{ secrets.ECR_REGISTRY }}/log-message-processor:latest
+            ${{ secrets.ECR_REGISTRY }}/log-message-processor:${{ github.sha }}
