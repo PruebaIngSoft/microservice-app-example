@@ -1,24 +1,39 @@
-name: CI Todos API
+name: CI/CD - todos-api
+
 on:
   push:
-    branches: [ develop, feature/* ]
-    paths: [ 'todos-api/**' ]
+    branches: [ "develop" ]
+    paths:
+      - "todos-api/**"
   pull_request:
-    branches: [ develop ]
-    paths: [ 'todos-api/**' ]
+    branches: [ "develop" ]
+    paths:
+      - "todos-api/**"
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          node-version: '18'
-      - name: Install dependencies
-        run: cd todos-api && npm ci
-      - name: Run tests
-        run: cd todos-api && npm test || echo "No tests found"
-      - name: Build Docker image
-        run: docker build -t naysp/todos-api:${{ github.sha }} ./todos-api
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./todos-api
+          push: true
+          tags: |
+            ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+            ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
