@@ -1,19 +1,14 @@
-FROM node:10
-
-# Crear carpeta de trabajo
+FROM node:18 AS build
 WORKDIR /app
 
-# Copiar package.json
 COPY package*.json ./
-
-# Instalar dependencias
-RUN npm install --legacy-peer-deps
-
-# Copiar el resto del código
+RUN npm ci
 COPY . .
+RUN npm run build
 
-# Exponer el puerto que usa el dev-server
-EXPOSE 8080
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Comando para correr
-CMD ["npm", "run", "dev"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
