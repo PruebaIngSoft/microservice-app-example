@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "description": "UI for sample distributed TODO app",
-  "author": "elgris <iddqd07@yandex.ru>",
+  "author": "nsjsc",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
