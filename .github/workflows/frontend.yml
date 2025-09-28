@@ -18,6 +18,11 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Install legacy Python 2 for node-sass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python2-minimal python-is-python2 make g++
+          
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
