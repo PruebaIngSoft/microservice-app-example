@@ -1,5 +1,7 @@
 # Frontend
 
+This is a test.
+
 UI for sample distributed TODO application.
 
 ## Configuration

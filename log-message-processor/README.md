@@ -1,4 +1,7 @@
 # Log Message Processor
+
+This is a test.
+
 This service is written in Python. This is a consumer that listens for
 new messages in Redis queue and prints message content to the standard output.
 
